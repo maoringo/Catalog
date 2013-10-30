@@ -1,10 +1,21 @@
 require 'roo'
 require 'spreadsheet'
 require 'kconv'
-
+require "csv"
 require './excel_base'
 include ExcelBase
 
+catalog_ary = []
+fromCatalogAry = []
+#カタログデータの読み込み
+CSV.open("integbio_dbcatalog_20131030_utf8.csv",'r'){|row|
+catalog_ary =  row.to_a
+}
+catalog_ary.each do |elem|
+fromCatalogAry << elem[1]
+end
+
+#もとの調査ファイルの読み込み
 lineAry = []
 lineArys = []
 spst = Roo::Excel.new(ARGV[0])
@@ -16,15 +27,13 @@ end
 lineAry << lineArys
 lineArys = []
 end
-
  
 default_format = NormalFormat.new
 workbook = Spreadsheet::Workbook.new
 workbook.default_format = default_format
 worksheet = workbook.create_worksheet
 
-fromCatalogAry = ["レセプトデータ","OLAP","e-STAT"]
-
+#該当するものを色付け
 lineAry.each_with_index do |line,i|
     line.each_with_index do |elem,j|
         worksheet[i,j] = elem
